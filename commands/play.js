@@ -1,5 +1,5 @@
 const Command = require('./command')
-const YTStream = require('youtube-audio-stream')
+const YTStream = require('ytdl-core')
 
 module.exports = class Play extends Command {
 
@@ -17,9 +17,15 @@ module.exports = class Play extends Command {
       .join()
       .then( connection => {
         let stream = YTStream(args[1])
-        connection.playStream(stream).on('end', () => {
+        stream.on('error', function(){
+          message.reply('There was an error while trying to read play this music')
           connection.disconnect()
         })
+        connection
+          .playStream(stream)
+          .on('end', () => {
+            connection.disconnect()
+          })
       })
   }
 
